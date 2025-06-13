@@ -2,6 +2,7 @@
 members = [
     "bin/cli",
     "bin/utxo-spend",
+    "bin/signing",
     "tests",
     "crates/node",
     "crates/protocol",

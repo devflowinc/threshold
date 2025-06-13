@@ -210,7 +210,7 @@ pub fn load_dkg_keys(
     }
 }
 
-pub fn generate_keys_from_mnemonic(mnemonic: &str) -> (Address, PrivateKey) {
+pub fn generate_keys_from_mnemonic(mnemonic: &str) -> (Address, PrivateKey, CompressedPublicKey) {
     // Generate a new mnemonic (12 words)
     let mnemonic = Mnemonic::parse_in_normalized(Language::English, mnemonic).unwrap();
 
@@ -232,5 +232,5 @@ pub fn generate_keys_from_mnemonic(mnemonic: &str) -> (Address, PrivateKey) {
             .expect("Failed to convert public key to compressed public key");
     let address = Address::p2wpkh(&compressed_public_key, Network::Testnet);
 
-    (address, private_key)
+    (address, private_key, compressed_public_key)
 }

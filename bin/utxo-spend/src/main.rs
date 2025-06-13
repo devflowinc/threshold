@@ -30,7 +30,8 @@ async fn main() {
         .expect("Fee sats must be a valid number");
 
     let mnemonic = std::env::var("MNEMONIC").expect("MNEMONIC env variable not set");
-    let (address, private_key) = generate_keys_from_mnemonic(mnemonic.as_str());
+    let (address, private_key, compressed_public_key) =
+        generate_keys_from_mnemonic(mnemonic.as_str());
     println!("Sender address: {}. Loading wallet utxos...", address);
 
     let oracle = protocol::oracle::EsploraOracle::new(true);
@@ -51,6 +52,7 @@ async fn main() {
 
     let signed_tx = wallet.sign(&tx, &private_key, sighash);
 
+    println!("Public key: {:?}", compressed_public_key);
     println!("Signed transaction");
 
     oracle
