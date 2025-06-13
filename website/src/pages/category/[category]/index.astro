@@ -1,0 +1,43 @@
+---
+import BlogPostCard from "@components/BlogPostCard.astro";
+import HomeLayout from "@layouts/HomeLayout.astro";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+  const categories = await getCollection("blogCategories");
+  const allPosts = await getCollection("blogPosts");
+
+  const catFreqs = allPosts.reduce(
+    (acc, post) => {
+      post.data.categories.forEach((cat) => {
+        if (!acc[cat]) {
+          acc[cat] = 0;
+        }
+        acc[cat]++;
+      });
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
+  return categories.map(({ id, data: category }) => ({
+    params: { category: id },
+    props: {
+      category,
+      catFreqs,
+      posts: allPosts.filter((p) => p.data.categories.includes(id)),
+    },
+  }));
+}
+
+const { posts, category, catFreqs } = Astro.props;
+---
+
+<HomeLayout title=`${category.name} | Blog | Trieve`>
+  <section>
+    <h1>Category: <code>{category.name}</code></h1>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {posts.map(async (e) => <BlogPostCard post={e} catFreqs={catFreqs} />)}
+    </div>
+  </section>
+</HomeLayout>

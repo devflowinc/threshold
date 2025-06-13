@@ -1,0 +1,50 @@
+---
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+
+interface Props {
+  post: Awaited<ReturnType<typeof getCollection<"blogPosts">>>[number];
+  catFreqs: Record<string, number>;
+}
+
+const { post, catFreqs } = Astro.props;
+---
+
+<article
+  class="p-6 bg-white rounded-lg border border-btcgray-50 hover:border-btcgray-200 transition-colors"
+>
+  <a href={`/blog/${post.id}`} class="no-underline">
+    {
+      post.data.opengraph.image && (
+        <Image
+          src={post.data.opengraph.image}
+          alt="Cover image"
+          class="w-full rounded-md mb-6"
+        />
+      )
+    }
+    <h2
+      class="text-2xl font-semibold text-btcgray-900 mb-2 hover:text-btcgray-700 transition-colors"
+    >
+      {post.data.title}
+    </h2>
+    <time class="text-sm text-btcgray-600 mb-4 block">
+      {post.data.createdAt?.toLocaleDateString() ?? "Unknown Date"}
+    </time>
+    <p class="text-btcgray-700 mb-6 leading-relaxed">
+      {post.data.opengraph.description}
+    </p>
+  </a>
+  <div class="flex flex-row flex-wrap gap-2">
+    {
+      post.data.categories.map((cat) => (
+        <a
+          href={`/category/${cat}`}
+          class="px-3 py-1 text-sm bg-btcgray-100 text-btcgray-700 rounded-full hover:bg-btcgray-200 transition-colors"
+        >
+          {cat} ({catFreqs[cat]})
+        </a>
+      ))
+    }
+  </div>
+</article>

@@ -1,0 +1,88 @@
+---
+import BlogPostCard from "@components/BlogPostCard.astro";
+import HomeLayout from "@layouts/HomeLayout.astro";
+import { getCollection } from "astro:content";
+
+const allPosts = await getCollection("blogPosts").then((posts) =>
+  posts
+    .filter((e) => !e.data.isDraft)
+    .toSorted(
+      (a, b) =>
+        (b.data.createdAt?.getTime() ?? 0) - (a.data.createdAt?.getTime() ?? 0)
+    )
+);
+
+const catFreqs = allPosts.reduce(
+  (acc, post) => {
+    post.data.categories.forEach((cat) => {
+      if (!acc[cat]) {
+        acc[cat] = 0;
+      }
+      acc[cat]++;
+    });
+    return acc;
+  },
+  {} as Record<string, number>
+);
+
+const postsByYear = allPosts.reduce(
+  (acc, post) => {
+    const year = post.data.createdAt?.getFullYear().toString() ?? "Unknown";
+    if (!acc[year]) {
+      acc[year] = [];
+    }
+    acc[year].push(post);
+    return acc;
+  },
+  {} as Record<string, typeof allPosts>
+);
+---
+
+<HomeLayout
+  title="Blog Posts | Threshold Security"
+  type="article"
+  imageUrl="/images/blog-og-default.png"
+  description="Read the latest articles, tutorials, and updates from The Threshold Security blog."
+  publishedTime="2025-06-12T00:00:00.000Z"
+  modifiedTime="2025-06-12T00:00:00.000Z"
+  author="The Threshold Security Team"
+  primaryCategory="General"
+>
+  <div
+    class="bg-white flex flex-col items-center justify-center text-btcgray-800 max-w-4xl mx-auto px-10 sm:px-12 lg:px-14 py-12"
+  >
+    <h1 class="text-4xl font-bold mb-8 text-btcgray-900">Blog Posts</h1>
+
+    <div class="mb-8">
+      <h2 class="text-lg font-semibold mb-3 text-btcgray-800">Categories</h2>
+      <div class="flex flex-row flex-wrap gap-2">
+        {
+          Object.keys(catFreqs).map((cat) => (
+            <a
+              href={`/category/${cat}`}
+              class="px-3 py-1 bg-btcgray-100 rounded-full text-sm hover:bg-btcgray-200 transition-colors"
+            >
+              {cat}
+              <span class="text-btcgray-600">({catFreqs[cat]})</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    {
+      Object.entries(postsByYear).map(([year, posts]) => (
+        <section class="mb-12">
+          <h2 class="text-2xl font-bold mb-6 border-b border-btcgray-50 pb-2 text-btcgray-900">
+            {year}
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {posts.map((post) => (
+              <BlogPostCard post={post} catFreqs={catFreqs} />
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</HomeLayout>

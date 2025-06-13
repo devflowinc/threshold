@@ -5,6 +5,7 @@ import mdx from "@astrojs/mdx";
 import keystatic from "@keystatic/astro";
 import react from "@astrojs/react";
 import icon from "astro-icon";
+import sitemap from "@astrojs/sitemap";
 import { SiteUrl } from "./src/theme.config";
 
 // https://astro.build/config
@@ -32,6 +33,7 @@ export default defineConfig({
     ...(process.env.SKIP_KEYSTATIC ? [] : [keystatic()]),
     react(),
     icon(),
+    sitemap(),
   ],
   experimental: {
     fonts: [

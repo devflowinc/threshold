@@ -20,71 +20,93 @@ invariant(i18n, "No homepage content found");
   author={i18n.openGraph.author}
   primaryCategory={i18n.openGraph.primaryCategory}
 >
-  <div class="flex flex-col md:flex-row gap-16 w-full max-w-4xl">
-    <section class="flex-1">
-      <h2 class="text-2xl font-semibold mb-4 border-l-4 border-brand-500 pl-4">
-        {i18n.waitlist.label}
-      </h2>
-      <p class="mb-4 text-btcgray-600">
-        {i18n.waitlist.description}
+  <div
+    class="flex flex-col items-center justify-center text-btcgray-800 max-w-4xl mx-auto px-10 sm:px-12 lg:px-14 py-12"
+  >
+    <header class="text-center mb-8 sm:mb-16">
+      <h1
+        class="text-4xl md:text-6xl font-bold mb-4 border-b-2 sm:pb-6 pb-3 border-brand-500"
+      >
+        {i18n.openGraph.title}
+      </h1>
+      <p class="text-sm md:text-base text-btcgray-600">
+        {i18n.openGraph.description}
       </p>
-      <form class="flex flex-col">
-        <input
-          type="email"
-          placeholder={i18n.waitlist.inputPlaceholder}
-          class="border border-btcgray-300 p-3 rounded mb-1 focus:ring-2 focus:ring-brand-500 outline-none"
-          required
-        />
-        <p class="text-sm text-btcgray-600">
-          &rarr; <span id="subscriber-count-value">4</span>
-          {i18n.waitlist.numberSuffix}
+    </header>
+    <article class="flex flex-col md:flex-row gap-8 sm:gap-16 w-full max-w-4xl">
+      <section class="flex-1">
+        <h2
+          class="text-2xl font-semibold mb-4 border-l-4 border-brand-500 pl-4"
+        >
+          {i18n.waitlist.label}
+        </h2>
+        <p class="mb-4 text-btcgray-600">
+          {i18n.waitlist.description}
         </p>
-        <button
-          type="submit"
-          class="bg-btcgray-800 mt-4 text-white p-3 rounded hover:bg-btcgray-700 hover:cursor-pointer disabled:cursor-not-allowed"
-        >
-          {i18n.waitlist.buttonText}
-        </button>
-        <a
-          href="https://github.com/devflowinc/threshold"
-          target="_blank"
-          rel="noopener noreferrer"
-          id="star-repo-button"
-          class="mt-4 flex items-center justify-center bg-white text-btcgray-800 border border-btcgray-800 p-3 rounded hover:bg-btcgray-100 hover:cursor-pointer w-full"
-        >
-          <Icon name="simple-icons:github" class="w-4 h-4 mr-2" />
-          <span>star us</span>
-          <span class="mx-1">|</span>
-          <span id="github-star-count">4</span>
-        </a>
-      </form>
-    </section>
+        <form class="flex flex-col">
+          <input
+            type="email"
+            placeholder={i18n.waitlist.inputPlaceholder}
+            class="border border-btcgray-300 p-3 rounded mb-1 focus:ring-2 focus:ring-brand-500 outline-none"
+            required
+          />
+          <p class="text-sm text-btcgray-600">
+            &rarr; <span id="subscriber-count-value">4</span>
+            {i18n.waitlist.numberSuffix}
+          </p>
+          <button
+            type="submit"
+            class="bg-btcgray-800 mt-4 text-white p-3 rounded hover:bg-btcgray-700 hover:cursor-pointer disabled:cursor-not-allowed"
+          >
+            {i18n.waitlist.buttonText}
+          </button>
+          <a
+            href="https://github.com/devflowinc/threshold"
+            target="_blank"
+            rel="noopener noreferrer"
+            id="star-repo-button"
+            class="mt-4 flex items-center justify-center bg-white text-btcgray-800 border border-btcgray-800 p-3 rounded hover:bg-btcgray-100 hover:cursor-pointer w-full"
+          >
+            <Icon name="simple-icons:github" class="w-4 h-4 mr-2" />
+            <span>star us</span>
+            <span class="mx-1">|</span>
+            <span id="github-star-count">4</span>
+          </a>
+          <div class="flex w-full items-center mt-4 text-sm text-btcgray-600">
+            <Icon name="simple-icons:ycombinator" class="w-4 h-4 mr-2" />
+            <span>Backed by Y Combinator</span>
+          </div>
+        </form>
+      </section>
 
-    <section class="flex-1">
-      <h2 class="text-2xl font-semibold mb-4 border-l-4 border-brand-500 pl-4">
-        {i18n.roadmap.label}
-      </h2>
-      <ul class="space-y-4 w-full">
-        {
-          i18n.roadmap.items.map((item) => (
-            <li class="flex items-start">
-              <span
-                class={`rounded-full w-3 h-3 mr-3 mt-1.5 ${
-                  item.status === "in progress"
-                    ? "bg-brand-500"
-                    : "bg-btcgray-400"
-                }`}
-              />
-              <div class="w-[93%]">
-                <h3 class="font-semibold">{item.label}</h3>
-                <p class="text-sm text-btcgray-600">{item.description}</p>
-                <span class="text-xs text-btcgray-400">{item.status}</span>
-              </div>
-            </li>
-          ))
-        }
-      </ul>
-    </section>
+      <section class="flex-1">
+        <h2
+          class="text-2xl font-semibold mb-4 border-l-4 border-brand-500 pl-4"
+        >
+          {i18n.roadmap.label}
+        </h2>
+        <ul class="space-y-4 w-full">
+          {
+            i18n.roadmap.items.map((item) => (
+              <li class="flex items-start">
+                <span
+                  class={`rounded-full w-3 h-3 mr-3 mt-1.5 ${
+                    item.status === "in progress"
+                      ? "bg-brand-500"
+                      : "bg-btcgray-400"
+                  }`}
+                />
+                <div class="w-[93%]">
+                  <h3 class="font-semibold">{item.label}</h3>
+                  <p class="text-sm text-btcgray-600">{item.description}</p>
+                  <span class="text-xs text-btcgray-400">{item.status}</span>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </article>
   </div>
 </HomeLayout>
 <script>
@@ -273,7 +295,7 @@ invariant(i18n, "No homepage content found");
 
     try {
       const response = await fetch(
-        "https://listmonk.skeptrune.com/api/lists/3",
+        "https://listmonk.skeptrune.com/api/lists?page=1&query=&order_by=id&order=asc",
         {
           method: "GET",
           headers: {
@@ -284,13 +306,19 @@ invariant(i18n, "No homepage content found");
 
       if (response.ok) {
         const data = await response.json();
-        if (
-          data &&
-          data.data &&
-          typeof data.data.subscriber_count === "number"
-        ) {
-          subscriberCountValue.textContent =
-            data.data.subscriber_count.toLocaleString();
+        if (data && data.data && Array.isArray(data.data.results)) {
+          const list = data.data.results.find(
+            (item: { id: number }) => item.id === 3
+          );
+          if (list && typeof list.subscriber_count === "number") {
+            subscriberCountValue.textContent =
+              list.subscriber_count.toLocaleString();
+          } else {
+            console.error(
+              "List with id 3 not found or subscriber_count missing:",
+              data
+            );
+          }
         } else {
           console.error(
             "Failed to parse subscriber count from Listmonk API response:",
@@ -315,7 +343,7 @@ invariant(i18n, "No homepage content found");
     }
     try {
       const response = await fetch(
-        "https.api.github.com/repos/devflowinc/threshold"
+        "https://api.github.com/repos/devflowinc/threshold"
       );
       if (response.ok) {
         const data = await response.json();

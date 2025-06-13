@@ -1,0 +1,117 @@
+---
+import HomeLayout from "@layouts/HomeLayout.astro";
+import { Image } from "astro:assets";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection("blogPosts");
+  const catFreqs = allPosts.reduce(
+    (acc, post) => {
+      post.data.categories.forEach((cat) => {
+        if (!acc[cat]) {
+          acc[cat] = 0;
+        }
+        acc[cat]++;
+      });
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+  return allPosts.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry, catFreqs },
+  }));
+}
+
+const { entry, catFreqs } = Astro.props;
+
+const { Content } = await render(entry);
+
+const i18n = entry.data;
+---
+
+<HomeLayout
+  title=`${i18n.title}`
+  type="article"
+  imageUrl={i18n.opengraph.image?.src}
+  description={i18n.opengraph.description}
+  publishedTime={i18n.createdAt?.toISOString()}
+  modifiedTime={i18n.lastUpdatedAt?.toISOString()}
+  author={i18n.opengraph.author}
+  primaryCategory={i18n.categories[0]}
+>
+  <article
+    class="flex flex-col items-start justify-start bg-white text-btcgray-800 max-w-4xl mx-auto px-10 sm:px-12 lg:px-14 py-12"
+  >
+    <div
+      class="flex flex-row items-center justify-start gap-2 mb-1 text-sm text-btcgray-600"
+    >
+      {
+        i18n.createdAt?.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      }
+      {
+        i18n.lastUpdatedAt &&
+          i18n.createdAt &&
+          i18n.lastUpdatedAt.getDate() !== i18n.createdAt.getDate() && (
+            <>
+              {" "}
+              (Updated:{" "}
+              {i18n.lastUpdatedAt.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+              )
+            </>
+          )
+      }, {i18n.opengraph.author || "Anonymous"}
+    </div>
+    <div class="flex flex-row flex-wrap gap-2 mt-0">
+      {
+        i18n.categories.map((cat) => (
+          <a
+            href={`/category/${cat}`}
+            class="px-3 py-1 bg-btcgray-100 rounded-full text-sm hover:bg-btcgray-200 transition-colors"
+          >
+            {cat} {catFreqs[cat] > 1 ? `(${catFreqs[cat]})` : ""}
+          </a>
+        ))
+      }
+    </div>
+    <h1
+      class="!mt-2 text-4xl font-bold text-btcgray-900 border-b-2 border-brand-500 pb-2"
+    >
+      {i18n.title}
+    </h1>
+    <div class="mt-4 mb-6">
+      <h6 class="text-lg text-btcgray-700">
+        {i18n.opengraph.description}
+      </h6>
+    </div>
+    {
+      i18n.opengraph.image && (
+        <div class="flex flex-col mb-10 mt-6">
+          <Image
+            src={i18n.opengraph.image}
+            alt="Cover image"
+            class="rounded-md w-full mx-auto shadow-sm"
+          />
+          <div class="flex justify-center mt-3">
+            <p class="text-xs text-btcgray-500 italic">
+              I had to vibe code something for this post haha. Use mouse or
+              touch to rotate and zoom. Click "Reset View" to return to the
+              initial angle.
+            </p>
+          </div>
+        </div>
+      )
+    }
+    <div class="prose prose-lg max-w-none mt-6 text-btcgray-800">
+      <Content components={{}} />
+    </div>
+  </article>
+</HomeLayout>

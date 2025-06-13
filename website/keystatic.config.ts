@@ -1,4 +1,6 @@
-import { config, fields, collection } from "@keystatic/core";
+import { config } from "@keystatic/core";
+import { blogPosts } from "@lib/keystatic/collections/blog-posts";
+import { blogCategories } from "@lib/keystatic/collections/blog-categories";
 import { homepage } from "@lib/keystatic/singletons/homepage";
 
 export default config({
@@ -7,18 +9,8 @@ export default config({
   },
   locale: "en-US",
   collections: {
-    posts: collection({
-      label: "Posts",
-      slugField: "title",
-      path: "src/content/posts/*",
-      format: { contentField: "content" },
-      schema: {
-        title: fields.slug({ name: { label: "Title" } }),
-        content: fields.markdoc({
-          label: "Content",
-        }),
-      },
-    }),
+    blogCategories,
+    blogPosts,
   },
   singletons: {
     homepage,

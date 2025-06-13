@@ -1,5 +1,5 @@
 import { collection, fields } from "@keystatic/core";
-import { block, wrapper } from "@keystatic/core/content-components";
+import { opengraph } from "../shared/opengraph";
 
 export const blogPosts = collection({
   label: "Blog posts",
@@ -8,8 +8,9 @@ export const blogPosts = collection({
   format: {
     contentField: "content",
   },
-  columns: ["title", "summary", "createdAt", "isDraft"],
+  columns: ["title", "createdAt", "isDraft"],
   schema: {
+    opengraph,
     title: fields.slug({
       name: {
         label: "Title",
@@ -20,8 +21,6 @@ export const blogPosts = collection({
         description: "The URL-friendly slug for the post",
       },
     }),
-    summary: fields.text({ label: "Summary", multiline: true }),
-    author: fields.text({ label: "Author" }),
     createdAt: fields.datetime({
       label: "Created at",
       defaultValue: { kind: "now" },
@@ -41,16 +40,6 @@ export const blogPosts = collection({
       }),
       { label: "Categories", itemLabel: (i) => i.value! }
     ),
-    coverImage: fields.image({
-      label: "Cover Image",
-      directory: "src/assets/images/blog-posts",
-      publicPath: "/src/assets/images/blog-posts/",
-    }),
-    ogSection: fields.text({
-      label: "OG Section",
-      description: "The section of the blog post for Open Graph",
-      defaultValue: "Technology",
-    }),
     content: fields.mdx({
       label: "Content",
       description: "The content of the post",
