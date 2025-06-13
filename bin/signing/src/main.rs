@@ -1,7 +1,6 @@
 use clap::{Parser, Subcommand};
 use node::grpc::grpc_handler::node_proto::{
-    node_control_client::NodeControlClient,
-    ConfirmWithdrawalRequest, ProposeWithdrawalRequest,
+    node_control_client::NodeControlClient, ConfirmWithdrawalRequest, ProposeWithdrawalRequest,
 };
 
 #[derive(Parser)]
@@ -113,4 +112,4 @@ async fn main() -> Result<(), String> {
     }
 
     Ok(())
-} 
+}
