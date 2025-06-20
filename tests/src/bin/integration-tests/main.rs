@@ -49,6 +49,10 @@ enum Commands {
         #[arg(short, long)]
         endpoint: Option<String>,
     },
+    CheckDkg {
+        #[arg(short, long)]
+        ports: String,
+    },
 }
 
 #[tokio::main]
@@ -74,6 +78,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             use_testnet,
         } => {
             run_end_to_end_test(amount, endpoint, use_testnet).await?;
+        }
+        Commands::CheckDkg { ports } => {
+            check_if_dkg_keys_exist(ports).await?;
         }
     }
 
@@ -259,5 +266,33 @@ async fn run_end_to_end_test(
     run_deposit_test(amount, 2000, endpoint.clone(), use_testnet).await?;
     run_withdrawal_test(amount / 2, endpoint).await?;
     println!("✅ End-to-end test passed");
+    Ok(())
+}
+
+async fn check_if_dkg_keys_exist(ports: String) -> Result<(), Box<dyn std::error::Error>> {
+    for port in ports.split(",") {
+        let mut client = NodeControlClient::connect(format!("http://127.0.0.1:{port}")).await?;
+
+        let mnemonic = std::env::var("MNEMONIC").expect("MNEMONIC env variable not set");
+        let (_, _, sender_pub) = generate_keys_from_mnemonic(&mnemonic);
+        let public_key = sender_pub.to_string();
+
+        let req = CreateDepositIntentRequest {
+            public_key: public_key.clone(),
+            amount_satoshis: 1000,
+        };
+
+        let response = client.create_deposit_intent(req).await;
+
+        match response {
+            Ok(_) => {}
+            Err(e) => {
+                panic!("Deposit intent creation failed for node on port {port}: {e}");
+            }
+        }
+    }
+
+    println!("✅ DKG keys exist");
+
     Ok(())
 }

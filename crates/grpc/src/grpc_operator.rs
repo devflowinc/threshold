@@ -101,12 +101,12 @@ pub async fn create_deposit_intent(
         .await
         .map_err(|e| Status::internal(format!("Network error: {e:?}")))?;
 
-    let SelfResponse::CreateDepositResponse {
-        deposit_tracking_id,
-        deposit_address,
-    } = response
-    else {
-        return Err(Status::internal("Invalid response from node"));
+    let (deposit_tracking_id, deposit_address) = match response {
+        SelfResponse::CreateDepositResponse {
+            deposit_tracking_id,
+            deposit_address,
+        } => (deposit_tracking_id, deposit_address),
+        err => return Err(Status::internal(format!("Error: {err:?}"))),
     };
 
     info!(

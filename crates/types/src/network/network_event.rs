@@ -113,4 +113,5 @@ pub enum SelfResponse {
     CheckBalanceResponse {
         balance_satoshis: u64,
     },
+    NodeError(crate::errors::NodeError),
 }

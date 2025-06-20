@@ -25,7 +25,7 @@ impl<N: Network + 'static, W: Wallet + 'static> NodeState<N, W> {
         info!("Local peer id: {}", self.peer_id);
 
         let mut round_time: tokio::time::Interval =
-            tokio::time::interval(std::time::Duration::from_secs(1));
+            tokio::time::interval(std::time::Duration::from_secs(10));
 
         loop {
             tokio::select! {
@@ -47,6 +47,7 @@ impl<N: Network + 'static, W: Wallet + 'static> NodeState<N, W> {
         let mut handlers = std::mem::take(&mut self.handlers);
 
         for handler in &mut handlers {
+            info!("Handling event: {:?}", send_message);
             handler.handle(self, send_message.clone()).await?;
         }
 
