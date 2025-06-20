@@ -29,26 +29,54 @@ impl<N: Network, W: Wallet> Handler<N, W> for DepositIntentState {
                     },
                 response_channel,
             }) => {
-                let (deposit_tracking_id, deposit_address) =
-                    self.create_deposit(node, &user_pubkey, amount_sat).await?;
+                println!("Node receveived request to create deposit");
+                let response = self.create_deposit(node, &user_pubkey, amount_sat).await;
                 if let Some(response_channel) = response_channel {
-                    response_channel
-                        .send(SelfResponse::CreateDepositResponse {
-                            deposit_tracking_id,
-                            deposit_address,
-                        })
-                        .map_err(|e| NodeError::Error(format!("Failed to send response: {e}")))?;
+                    match response {
+                        Ok((deposit_tracking_id, deposit_address)) => {
+                            response_channel
+                                .send(SelfResponse::CreateDepositResponse {
+                                    deposit_tracking_id,
+                                    deposit_address,
+                                })
+                                .map_err(|e| {
+                                    NodeError::Error(format!("Failed to send response: {e}"))
+                                })?;
+                            println!("Deposit created");
+                        }
+                        Err(e) => {
+                            println!("Error creating deposit: {e:?}, sending response");
+                            response_channel
+                                .send(SelfResponse::NodeError(e))
+                                .map_err(|e| {
+                                    NodeError::Error(format!("Failed to send response: {e}"))
+                                })?;
+                        }
+                    }
                 }
             }
             Some(NetworkEvent::SelfRequest {
                 request: SelfRequest::GetPendingDepositIntents,
                 response_channel,
             }) => {
-                let response = self.get_pending_deposit_intents(node).await?;
+                let response = self.get_pending_deposit_intents(node).await;
                 if let Some(response_channel) = response_channel {
-                    response_channel
-                        .send(SelfResponse::GetPendingDepositIntentsResponse { intents: response })
-                        .map_err(|e| NodeError::Error(format!("Failed to send response: {e}")))?;
+                    match response {
+                        Ok(intents) => {
+                            response_channel
+                                .send(SelfResponse::GetPendingDepositIntentsResponse { intents })
+                                .map_err(|e| {
+                                    NodeError::Error(format!("Failed to send response: {e}"))
+                                })?;
+                        }
+                        Err(e) => {
+                            response_channel
+                                .send(SelfResponse::NodeError(e))
+                                .map_err(|e| {
+                                    NodeError::Error(format!("Failed to send response: {e}"))
+                                })?;
+                        }
+                    }
                 }
             }
             Some(NetworkEvent::SelfRequest {

@@ -6,7 +6,47 @@ on:
     branches: [main]
 
 jobs:
-  e2e-tests:
+  dkg_test:
+    runs-on: blacksmith-16vcpu-ubuntu-2204
+    env:
+      MNEMONIC: ${{ secrets.TEST_MNEMONIC }}
+      MNEMONIC_TO: ${{ secrets.TEST_MNEMONIC_TO }}
+      IS_TESTNET: "true"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache Rust dependencies
+        uses: useblacksmith/cache@v5
+
+      - name: Cache Rust dependencies
+        uses: useblacksmith/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-e2e-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Set up Rust toolchain
+        run: |
+          rustup update 1.87
+          rustup default 1.87
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler libclang-dev clang
+
+      - name: Create NodeCluster (3 nodes)
+        run: ./setup_nodes.sh 3
+
+# # run test
+# PORTS=$(seq $BASE_GRPC_PORT $((BASE_GRPC_PORT + NUM_NODES - 1)) | paste -sd, -)
+#  "$PORTS"
+
+      - name: Run end-to-end integration tests
+        run: cargo run --bin integration-tests check-dkg --ports 50057,50058,50059
+
+  end-to-end-deposit-withdrawal:
     runs-on: blacksmith-16vcpu-ubuntu-2204
     env:
       MNEMONIC: ${{ secrets.TEST_MNEMONIC }}
@@ -33,19 +73,6 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y protobuf-compiler libclang-dev clang
 
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v3
-
-      # - name: Build vault-node image (cached)
-      #   uses: useblacksmith/build-push-action@v1
-      #   with:
-      #     context: .
-      #     file: Dockerfile
-      #     tags: vault-node:latest
-      #     load: true
-      #     cache-from: type=gha
-      #     cache-to: type=gha,mode=max
-
       - run: cargo clean
 
       - name: Start 5-node stack (docker-compose)
@@ -67,8 +94,7 @@ jobs:
       - name: Run end-to-end integration tests
         run: cargo run --bin integration-tests end-to-end-test 10000
 
-      - name: Shutdown stack & print logs (always)
-        if: always()
+      - name: Shutdown stack & print logs
         run: |
           docker compose -f docker-compose.yaml logs --no-color || true
           docker compose -f docker-compose.yaml down --volumes --remove-orphans || true

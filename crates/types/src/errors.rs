@@ -1,8 +1,8 @@
+use derive_more::Display;
+use serde::{Deserialize, Serialize};
 use std::error::Error;
 
-use derive_more::Display;
-
-#[derive(Debug, Display, Clone)]
+#[derive(Debug, Display, Clone, Serialize, Deserialize)]
 pub enum NodeError {
     Error(String),
 }

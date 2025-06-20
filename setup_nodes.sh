@@ -19,6 +19,7 @@ NUM_NODES=${1:-5}
 BASE_DIR="test_artifacts/"
 
 CLI_CMD=(cargo run --quiet --bin cli)
+BASE_GRPC_PORT=50057
 DOCKER_COMPOSE_FILE="docker-compose.yaml"
 KEY_PASSWORD="supersecret"
 
@@ -132,15 +133,18 @@ EOL
 for i in $(seq 1 "$NUM_NODES"); do
   node_name="node_${i}"
   node_dir="$CONFIGS_DIR/$node_name"
+  host_port=$((BASE_GRPC_PORT + i - 1))
 
   cat >> "$BASE_DIR/test_${NUM_NODES}_nodes/$DOCKER_COMPOSE_FILE" <<EOL
   node${i}:
-    image: vault-node
+    image: threshold-node
     environment:
       - KEY_PASSWORD=${KEY_PASSWORD}
       - IS_TESTNET=true
       - RUST_LOG=info
     entrypoint: "/app/cli run --key-file-path /app/configs/${node_name}.json --config-file-path /app/configs/${node_name}.yaml --use-mock-oracle"
+    ports:
+      - "${host_port}:50051"
     volumes:
       - ./${node_name}/${node_name}.json:/app/configs/${node_name}.json
       - ./${node_name}/${node_name}.yaml:/app/configs/${node_name}.yaml
@@ -163,9 +167,14 @@ echo "Successfully generated '$BASE_DIR/test_${NUM_NODES}_nodes/$DOCKER_COMPOSE_
 echo -e "\nBuilding Docker image..."
 
 cd "$BASE_DIR/test_${NUM_NODES}_nodes"
-docker build -t vault-node -f ../../Dockerfile ../..
+docker build -t threshold-node -f ../../Dockerfile ../..
 
 # ------------------- Start Docker Compose ----------------------------
 echo -e "\nStarting Docker Compose for $NUM_NODES nodes..."
 
 docker compose -f "$DOCKER_COMPOSE_FILE" up -d
+
+# Wait 10 seconds for dkg to complete
+sleep 20s
+
+echo "All nodes started."
